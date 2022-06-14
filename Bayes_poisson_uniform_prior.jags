@@ -1,0 +1,19 @@
+# The true unknown date of COVID-19 infection are assumed to be between the date of positive test and 14 days prior to it. 
+#----------------------------------------------------------------------------------------
+# JAGS model for the code
+# Inputs: nevents = number of events, stop = (test positive date -14) – baseline date, start = baseline 
+# date, py_deno = sum of person-days for non-events, adj = 100000 (units for incidence rate: per 100,000
+# person-days)
+#----------------------------------------------------------------------------------------
+
+model{
+  for(i in 1:nevents){
+    py[i] ~ dunif(start[i],stop[i]) 
+  }
+  py_case <- sum(py[1:nevents])
+  py_total <- py_case+py_deno
+  
+  nevents ~ dpois(py_total*lambda)
+  lambda ~ dgamma(0.0001,0.0001) 
+  lambda2 <- lambda*adj
+}
